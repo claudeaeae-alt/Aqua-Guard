@@ -1,0 +1,132 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Aqua Guard — Smart Water Tank Alert System</title>
+<style>
+:root{--blue:#0284c7;--navy:#075985;--bg:#f1f7fb;--ink:#123047;--muted:#617789;--card:#fff;--line:#dce8ef;--green:#15803d;--red:#dc2626;--amber:#b45309}
+*{box-sizing:border-box}body{margin:0;background:var(--bg);color:var(--ink);font:15px/1.5 Arial,Helvetica,sans-serif}
+header{background:linear-gradient(130deg,#075985,#0284c7);color:white;padding:24px max(18px,calc((100% - 1050px)/2))}
+.brand{display:flex;align-items:center;gap:12px}.logo{font-size:35px}.brand h1{font-size:23px;margin:0}.brand p{margin:2px 0 0;color:#d9f2ff;font-size:12px;letter-spacing:1px}
+header h2{margin:22px 0 4px;font-size:25px}header .sub{margin:0;color:#e0f2fe}
+main{max-width:1050px;margin:20px auto;padding:0 16px 40px}
+nav{display:flex;gap:8px;flex-wrap:wrap;margin-bottom:16px}.tab{border:1px solid var(--line);background:white;padding:10px 15px;border-radius:12px;cursor:pointer;font-weight:700;color:var(--muted)}.tab.active{background:#e0f2fe;color:#0369a1;border-color:#7dd3fc}
+.panel{background:var(--card);border:1px solid var(--line);border-radius:18px;padding:20px;box-shadow:0 5px 18px #16415b0b;margin-bottom:16px}
+h3{margin:0 0 14px;font-size:19px}.muted{color:var(--muted)}.grid{display:grid;grid-template-columns:repeat(4,1fr);gap:12px}.stat{background:#f4f9fc;border-radius:14px;padding:15px}.stat .value{font-size:25px;font-weight:800;color:var(--blue);margin:5px 0}.stat small{color:var(--muted)}
+label{display:block;font-weight:700;margin:12px 0 6px}input[type=text],input[type=number]{width:100%;padding:11px;border:1px solid #cbd9e2;border-radius:10px;font-size:15px}input[type=range]{width:100%;accent-color:var(--blue)}
+.row{display:flex;justify-content:space-between;align-items:center;gap:12px;flex-wrap:wrap}.tank-wrap{display:flex;align-items:center;justify-content:center;gap:30px;flex-wrap:wrap;padding:12px}.tank{width:145px;height:220px;border:5px solid #64748b;border-radius:20px 20px 13px 13px;overflow:hidden;display:flex;flex-direction:column;justify-content:flex-end;background:#f8fcff;box-shadow:inset 0 0 0 3px #e2e8f0}.water{background:linear-gradient(#38bdf8,#0284c7);width:100%;transition:height .3s;display:flex;align-items:center;justify-content:center;color:white;font-weight:bold}.level-big{font-size:42px;color:var(--blue);font-weight:800}.status{display:inline-block;padding:5px 10px;border-radius:99px;font-weight:700;font-size:12px;background:#dcfce7;color:#166534}.status.low{background:#fee2e2;color:#991b1b}.status.high{background:#dcfce7;color:#166534}
+.alert{padding:15px;border-radius:13px;background:#ecfdf5;border:1px solid #bbf7d0}.alert.low{background:#fef2f2;border-color:#fecaca}.alert.high{background:#fffbeb;border-color:#fde68a}
+button{border:0;border-radius:10px;padding:11px 15px;background:var(--blue);color:white;font-weight:700;cursor:pointer;margin:5px 5px 0 0}button.secondary{background:#e8f1f6;color:#17445f}button:hover{filter:brightness(.96)}
+.switchline{display:flex;align-items:center;gap:9px;margin:12px 0}.switchline input{width:18px;height:18px;accent-color:var(--blue)}
+.item{display:flex;gap:14px;align-items:center;padding:13px 0;border-bottom:1px solid var(--line)}.item:last-child{border:0}.item .emoji{font-size:30px}.item b{display:block}.item p{margin:3px 0;color:var(--muted)}
+.log{padding:9px 0;border-bottom:1px solid var(--line);color:#35566c}.hidden{display:none}
+footer{text-align:center;color:var(--muted);font-size:12px;padding:15px}
+@media(max-width:700px){.grid{grid-template-columns:repeat(2,1fr)}header h2{font-size:21px}.panel{padding:15px}}
+</style>
+</head>
+<body>
+<header>
+ <div class="brand"><div class="logo">💧</div><div><h1>AQUA GUARD</h1><p>SMART WATER MANAGEMENT SYSTEM</p></div></div>
+ <h2>Smart Water Tank Alert System</h2>
+ <p class="sub">Monitor water levels • Prevent overflow • Save every drop</p>
+</header>
+<main>
+<nav>
+ <button class="tab active" data-tab="dashboard">🏠 Dashboard</button>
+ <button class="tab" data-tab="sensors">📡 Sensors</button>
+ <button class="tab" data-tab="alerts">🔔 Alerts & History</button>
+ <button class="tab" data-tab="about">ℹ️ About Project</button>
+</nav>
+<section id="dashboard" class="page">
+ <div class="panel">
+  <div class="row"><h3>Tank Overview</h3><span class="status">● DEMO ONLINE</span></div>
+  <label for="tankName">Tank name</label><input id="tankName" type="text" value="Main School Water Tank">
+  <div class="row">
+   <div style="flex:1;min-width:180px"><label for="capacity">Tank capacity (litres)</label><input id="capacity" type="number" min="1" value="5000"></div>
+   <div style="flex:1;min-width:180px"><label>Current condition</label><div id="condition" class="status">Normal</div></div>
+  </div>
+ </div>
+ <div class="grid">
+  <div class="stat">💧<div class="value" id="percent">65%</div><small>Water level</small></div>
+  <div class="stat">🌊<div class="value" id="litres">3,250</div><small>Water available (L)</small></div>
+  <div class="stat">📡<div class="value" id="sensorStat">Active</div><small>Sensor simulation</small></div>
+  <div class="stat">🚰<div class="value" id="pumpStat">OFF</div><small>Pump demo status</small></div>
+ </div>
+ <div class="panel">
+  <h3>Water Tank Visualization</h3>
+  <div class="tank-wrap"><div class="tank"><div class="water" id="water" style="height:65%">65%</div></div><div><div class="level-big" id="bigPercent">65%</div><div class="muted">Current water level</div><p><span class="status" id="tankStatus">Normal</span></p><small class="muted">0% Empty &nbsp; | &nbsp; 100% Full</small></div></div>
+  <label for="level">Adjust water level — sensor simulation</label>
+  <input id="level" type="range" min="0" max="100" step="5" value="65">
+  <div class="row muted"><small>Empty tank</small><b id="sliderValue">65%</b><small>Full tank</small></div>
+ </div>
+ <div class="panel"><h3>Automatic Alert</h3><div id="alertBox" class="alert">✅ Water level is normal. No immediate action is required.</div>
+  <div class="switchline"><input id="notifications" type="checkbox" checked><label for="notifications" style="margin:0">Enable alert notifications (on-screen)</label></div>
+  <div class="switchline"><input id="pump" type="checkbox"><label for="pump" style="margin:0">Pump ON (demo control only)</label></div>
+  <button id="fullBtn">Simulate Full Tank</button><button class="secondary" id="lowBtn">Simulate Low Water</button><button class="secondary" id="resetBtn">Reset Simulation</button>
+ </div>
+</section>
+<section id="sensors" class="page hidden">
+ <div class="panel"><h3>System Components</h3>
+  <div class="item"><div class="emoji">📡</div><div><b>Ultrasonic Sensor</b><p>Measures the distance between the sensor and the water surface to estimate the water level.</p></div></div>
+  <div class="item"><div class="emoji">🧠</div><div><b>Microcontroller</b><p>Processes sensor readings and checks whether the tank is low or nearly full.</p></div></div>
+  <div class="item"><div class="emoji">🔔</div><div><b>Audible Buzzer</b><p>Produces a sound warning when the water reaches a set alert level (hardware required).</p></div></div>
+  <div class="item"><div class="emoji">🎚️</div><div><b>Float Switch</b><p>Can provide an additional signal when water reaches a particular level.</p></div></div>
+  <div class="item"><div class="emoji">🚦</div><div><b>Indicator Lights</b><p>Show normal, low-water or full-tank conditions using different lights.</p></div></div>
+  <div class="switchline"><input id="sensorToggle" type="checkbox" checked><label for="sensorToggle" style="margin:0">Sensor simulation active</label></div>
+  <p class="muted">The sensor status here is simulated. This downloaded app is not connected to a physical sensor or controller.</p>
+ </div>
+</section>
+<section id="alerts" class="page hidden">
+ <div class="panel"><h3>Alert Centre</h3><div id="currentAlert" class="alert">Water level is normal.</div>
+  <div class="switchline"><input id="alertToggle" type="checkbox" checked><label for="alertToggle" style="margin:0">Enable alerts</label></div>
+  <h3 style="margin-top:22px">Recent Activity</h3><div id="history"><div class="log">System started — monitoring active.</div></div>
+  <button class="secondary" id="clearHistory">Clear history</button>
+ </div>
+</section>
+<section id="about" class="page hidden">
+ <div class="panel"><h3>About Our Project</h3><p><b>Project name:</b> Smart Water Tank Alert System</p>
+  <p>This project aims to prevent water wastage in schools and apartments by monitoring the amount of water in a storage tank. A sensor measures the water level, a microcontroller processes the reading, and an alert informs the caretaker when the tank is almost full or the water level is low.</p>
+  <h3>How the System Works</h3>
+  <ol><li><b>Sense:</b> The ultrasonic sensor measures the distance to the water surface.</li><li><b>Decide:</b> The microcontroller compares the reading with preset water-level limits.</li><li><b>Alert:</b> A buzzer or indicator provides a warning.</li><li><b>Respond:</b> The caretaker checks the tank and takes suitable action.</li></ol>
+  <h3>Main Benefits</h3><ul><li>Helps prevent tank overflow.</li><li>Reduces unnecessary water wastage.</li><li>Alerts caretakers when water is low.</li><li>Encourages responsible water management.</li><li>Can be expanded with mobile notifications and automatic pump control.</li></ul>
+  <div class="alert">🌱 <b>SAVE WATER. SAVE LIFE.</b><br>Every drop counts!</div>
+ </div>
+</section>
+<footer> A Q U A&nbsp; G U A R D · School Project Demonstration · Offline demo app<br>Simulation only — real sensors, buzzer, notifications and pump automation require hardware integration.</footer>
+</main>
+<script>
+let level=65, historyItems=["System started — monitoring active."], sensorActive=true;
+const $=id=>document.getElementById(id);
+function log(msg){historyItems.unshift(new Date().toLocaleTimeString()+" — "+msg);historyItems=historyItems.slice(0,12);renderHistory()}
+function renderHistory(){$("history").innerHTML=historyItems.length?historyItems.map(x=>'<div class="log">'+escapeHtml(x)+'</div>').join(""):'<p class="muted">No activity recorded.</p>'}
+function escapeHtml(s){return s.replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]))}
+function update(){
+ const cap=Math.max(1,Number($("capacity").value)||1), litres=Math.round(cap*level/100);
+ const status=level>=90?"Almost Full":level<=20?"Low Water":"Normal";
+ $("percent").textContent=level+"%";$("bigPercent").textContent=level+"%";$("sliderValue").textContent=level+"%";
+ $("litres").textContent=litres.toLocaleString("en-IN");$("water").style.height=level+"%";$("water").textContent=level+"%";
+ $("condition").textContent=status;$("tankStatus").textContent=status;
+ $("condition").className=$("tankStatus").className="status"+(level<=20?" low":level>=90?" high":"");
+ let msg=level>=90?"⚠️ TANK ALMOST FULL — Please check the tank and switch off the pump if necessary.":level<=20?"🔴 LOW WATER LEVEL — Please inform the caretaker and arrange to refill the tank.":"✅ WATER LEVEL NORMAL — No immediate action is required.";
+ $("alertBox").textContent=msg;$("currentAlert").textContent=msg;
+ if(!$("notifications").checked){$("alertBox").textContent="Notifications are disabled. "+msg}
+ $("pumpStat").textContent=$("pump").checked?"ON":"OFF";
+ $("sensorStat").textContent=sensorActive?"Active":"Offline";
+}
+function setLevel(v,record=true){level=Number(v);$("level").value=level;update();if(record)log("Water level changed to "+level+"%")}
+$("level").addEventListener("input",e=>setLevel(e.target.value));
+$("capacity").addEventListener("input",()=>update());
+$("fullBtn").onclick=()=>setLevel(100);
+$("lowBtn").onclick=()=>setLevel(10);
+$("resetBtn").onclick=()=>{setLevel(65,false);$("pump").checked=false;update();log("Simulation reset to normal level")};
+$("pump").addEventListener("change",()=>{update();log("Demo pump switched "+($("pump").checked?"ON":"OFF"))});
+$("sensorToggle").addEventListener("change",e=>{sensorActive=e.target.checked;update();log("Sensor simulation "+(sensorActive?"activated":"deactivated"))});
+$("notifications").addEventListener("change",()=>{update();log("Alert notifications "+($("notifications").checked?"enabled":"disabled"))});
+$("alertToggle").addEventListener("change",e=>{$("notifications").checked=e.target.checked;update()});
+$("clearHistory").onclick=()=>{historyItems=[];renderHistory()};
+document.querySelectorAll(".tab").forEach(btn=>btn.addEventListener("click",()=>{document.querySelectorAll(".tab").forEach(b=>b.classList.toggle("active",b===btn));document.querySelectorAll(".page").forEach(p=>p.classList.toggle("hidden",p.id!==btn.dataset.tab));}));
+update();renderHistory();
+</script>
+</body>
+</html>
